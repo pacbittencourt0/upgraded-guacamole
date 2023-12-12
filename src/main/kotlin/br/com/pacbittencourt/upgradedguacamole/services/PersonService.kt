@@ -1,59 +1,51 @@
 package br.com.pacbittencourt.upgradedguacamole.services
 
+import br.com.pacbittencourt.upgradedguacamole.exceptions.ResourceNotFoundException
 import br.com.pacbittencourt.upgradedguacamole.model.Person
+import br.com.pacbittencourt.upgradedguacamole.repository.PersonRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Logger
 
 @Service
 class PersonService {
 
-    private val counter: AtomicLong = AtomicLong()
+    @Autowired
+    private lateinit var repository: PersonRepository
 
     private val logger = Logger.getLogger(PersonService::class.java.name)
 
     fun findAll(): List<Person> {
         logger.info("Finding all people")
-
-        val persons = mutableListOf<Person>()
-
-        for (i in 0..7) {
-            val person = mockPerson(i)
-            persons.add(person)
-        }
-
-        return persons
+        return repository.findAll()
     }
 
     fun findById(id: Long): Person {
         logger.info("Finding one person")
-
-        return Person(
-            id = counter.incrementAndGet(),
-            firstName = "Pedro",
-            lastName = "Bittencourt",
-            address = "Juiz de Fora",
-            gender = "male"
-        )
+        return repository.findById(id)
+            .orElseThrow { ResourceNotFoundException("No records found!") }
     }
 
     fun create(person: Person): Person {
-        return person
+        logger.info("Creating person with name: ${person.firstName}")
+        return repository.save(person)
     }
 
     fun update(person: Person): Person {
-        return person
+        logger.info("Updating person with id: ${person.id}")
+        val entity = findById(person.id).apply {
+            firstName = person.firstName
+            lastName = person.lastName
+            address = person.address
+            gender = person.gender
+        }
+        return repository.save(entity)
     }
 
-    fun delete(id: Long) = Unit
-
-    private fun mockPerson(i: Int): Person {
-        return Person(
-            id = counter.incrementAndGet(),
-            firstName = "First Name $i",
-            lastName = "Last Name $i",
-            address = "address $i",
-            gender = "male"
-        )
+    fun delete(id: Long) {
+        logger.info("Deleting person with id: $id")
+        val entity = findById(id)
+        repository.delete(entity)
     }
+
 }

@@ -1,6 +1,6 @@
 package br.com.pacbittencourt.upgradedguacamole.controller
 
-import br.com.pacbittencourt.upgradedguacamole.model.Person
+import br.com.pacbittencourt.upgradedguacamole.data.vo.v1.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.services.PersonService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -24,7 +24,7 @@ class PersonController {
     @GetMapping(
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun findAll(): List<Person> {
+    fun findAll(): List<PersonVO> {
         return service.findAll()
     }
 
@@ -32,7 +32,7 @@ class PersonController {
         value = ["/{id}"],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun getPerson(@PathVariable(value = "id") id: Long): Person {
+    fun getPerson(@PathVariable(value = "id") id: Long): PersonVO {
         return service.findById(id)
     }
 
@@ -40,7 +40,7 @@ class PersonController {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun createPerson(@RequestBody person: Person): Person {
+    fun createPerson(@RequestBody person: PersonVO): PersonVO {
         return service.create(person)
     }
 
@@ -48,7 +48,7 @@ class PersonController {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun updatePerson(@RequestBody person: Person): Person {
+    fun updatePerson(@RequestBody person: PersonVO): PersonVO {
         return service.update(person)
     }
 

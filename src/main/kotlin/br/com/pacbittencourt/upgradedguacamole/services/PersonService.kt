@@ -3,17 +3,22 @@ package br.com.pacbittencourt.upgradedguacamole.services
 import br.com.pacbittencourt.upgradedguacamole.data.vo.v1.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.exceptions.ResourceNotFoundException
 import br.com.pacbittencourt.upgradedguacamole.mapper.DozerMapper
+import br.com.pacbittencourt.upgradedguacamole.mapper.custom.PersonMapper
 import br.com.pacbittencourt.upgradedguacamole.model.Person
 import br.com.pacbittencourt.upgradedguacamole.repository.PersonRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
+import br.com.pacbittencourt.upgradedguacamole.data.vo.v2.PersonVO as PersonVOV2
 
 @Service
 class PersonService {
 
     @Autowired
     private lateinit var repository: PersonRepository
+
+    @Autowired
+    private lateinit var personMapper: PersonMapper
 
     private val logger = Logger.getLogger(PersonService::class.java.name)
 
@@ -53,6 +58,12 @@ class PersonService {
     private fun findOne(id: Long): Person {
         return repository.findById(id)
             .orElseThrow { ResourceNotFoundException("No records found!") }
+    }
+
+    fun createV2(person: PersonVOV2): PersonVOV2 {
+        logger.info("Creating person with name: ${person.firstName}")
+        val entity: Person = personMapper.mapVOToEntity(person)
+        return personMapper.mapEntityToVO(repository.save(entity))
     }
 
 }

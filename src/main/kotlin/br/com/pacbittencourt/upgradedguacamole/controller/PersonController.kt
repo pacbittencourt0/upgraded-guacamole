@@ -1,7 +1,6 @@
 package br.com.pacbittencourt.upgradedguacamole.controller
 
 import br.com.pacbittencourt.upgradedguacamole.data.vo.v1.PersonVO
-import br.com.pacbittencourt.upgradedguacamole.data.vo.v2.PersonVO as PersonVOV2
 import br.com.pacbittencourt.upgradedguacamole.services.PersonService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -14,9 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import br.com.pacbittencourt.upgradedguacamole.data.vo.v2.PersonVO as PersonVOV2
 
 @RestController
-@RequestMapping("/person")
+@RequestMapping("/api/person/v1")
 class PersonController {
 
     @Autowired

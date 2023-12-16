@@ -1,11 +1,11 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/databasename?useTimezone=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/guacamole?useTimezone=true&serverTimezone=UTC
     username: root
-    password: root
+    password: maria777
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false

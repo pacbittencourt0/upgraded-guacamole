@@ -28,7 +28,7 @@ class MockPerson {
         return persons
     }
 
-    private fun mockEntity(number: Int): Person {
+    fun mockEntity(number: Int): Person {
         val person = Person()
         person.address = "Address Test$number"
         person.firstName = "First Name Test$number"
@@ -38,12 +38,12 @@ class MockPerson {
         return person
     }
 
-    private fun mockVO(number: Int): PersonVO {
+    fun mockVO(number: Int): PersonVO {
         val person = PersonVO()
         person.address = "Address Test$number"
         person.firstName = "First Name Test$number"
         person.gender = if (number % 2 == 0) "Male" else "Female"
-        person.id = number.toLong()
+        person.key = number.toLong()
         person.lastName = "Last Name Test$number"
         return person
     }

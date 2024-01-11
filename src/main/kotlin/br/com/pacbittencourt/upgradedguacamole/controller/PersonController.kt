@@ -3,6 +3,12 @@ package br.com.pacbittencourt.upgradedguacamole.controller
 import br.com.pacbittencourt.upgradedguacamole.data.vo.v1.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.services.PersonService
 import br.com.pacbittencourt.upgradedguacamole.util.AppMediaType
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/person/v1")
+@Tag(name = "People", description = "Endpoints for Managing People")
 class PersonController {
 
     @Autowired
@@ -23,6 +30,27 @@ class PersonController {
 
     @GetMapping(
         produces = [AppMediaType.APPLICATION_JSON, AppMediaType.APPLICATION_XML, AppMediaType.APPLICATION_YAML]
+    )
+    @Operation(
+        summary = "Finds all People", description = "Finds all People",
+        tags = ["People"],
+        responses = [
+            ApiResponse(
+                description = "Success",
+                responseCode = "200",
+                content = [Content(array = ArraySchema(schema = Schema(implementation = PersonVO::class)))]
+            ),
+            ApiResponse(
+                description = "No content",
+                responseCode = "204",
+                content = [Content(schema = Schema(implementation = Unit::class))]
+            ),
+            ApiResponse(
+                description = "Bad request",
+                responseCode = "400",
+                content = [Content(schema = Schema(implementation = Unit::class))]
+            ),
+        ]
     )
     fun findAll(): List<PersonVO> {
         return service.findAll()

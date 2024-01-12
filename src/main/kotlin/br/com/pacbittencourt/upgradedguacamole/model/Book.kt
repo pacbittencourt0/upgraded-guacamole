@@ -14,17 +14,17 @@ data class Book(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    var id: Long = 0,
 
     @Column(name = "author", nullable = false, length = 180)
-    val author: String = "",
+    var author: String = "",
 
     @Column(name = "launch_date", nullable = true)
-    val launchDate: Date? = null,
+    var launchDate: Date? = null,
 
     @Column(name = "price", nullable = false)
-    val price: Double = 0.0,
+    var price: Double = 0.0,
 
     @Column(name = "title", nullable = false, length = 180)
-    val title: String = "",
+    var title: String = "",
 )

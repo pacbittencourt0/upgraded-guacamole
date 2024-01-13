@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/book")
+@RequestMapping("/api/book/v1")
 @Tag(name = "Book", description = "Endpoints for managing all your books")
 class BookController {
 

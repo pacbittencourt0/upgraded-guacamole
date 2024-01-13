@@ -1,9 +1,8 @@
+server:
+  port: 8888
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/guacamole?useTimezone=true&serverTimezone=UTC
-    username: root
-    password: maria777
   jpa:
     hibernate:
       ddl-auto: none

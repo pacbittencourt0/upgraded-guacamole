@@ -1,5 +1,10 @@
 cors:
   originPatterns: https://localhost:3000,https://localhost:8080,https://erudio.com.br
+security:
+  jwt:
+    token:
+      secret-key: pedroca
+      expire-length: 3600000
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver

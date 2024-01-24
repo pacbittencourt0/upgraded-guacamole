@@ -1,15 +1,6 @@
 package br.com.pacbittencourt.upgradedguacamole.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
@@ -28,7 +19,7 @@ class User : UserDetails {
     var fullName: String? = null
 
     @Column(name = "password", length = 255)
-    var password: String? = null
+    var userPassword: String? = null
 
     @Column(name = "account_non_expired")
     var accountNonExpired: Boolean? = null
@@ -50,7 +41,7 @@ class User : UserDetails {
     )
     var permissions: List<Permission> = emptyList()
 
-    val role: List<String?>
+    val roles: List<String?>
         get() {
             val roles: MutableList<String?> = ArrayList()
             for (permission in permissions) {
@@ -64,7 +55,7 @@ class User : UserDetails {
     }
 
     override fun getPassword(): String {
-        return password!!
+        return userPassword!!
     }
 
     override fun getUsername(): String {

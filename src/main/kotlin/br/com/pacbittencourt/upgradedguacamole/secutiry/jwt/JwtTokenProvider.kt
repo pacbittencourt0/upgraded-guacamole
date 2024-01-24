@@ -16,8 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.util.Base64
-import java.util.Date
+import java.util.*
 
 @Service
 class JwtTokenProvider {
@@ -39,7 +38,7 @@ class JwtTokenProvider {
         algorithm = Algorithm.HMAC256(secretKey.toByteArray())
     }
 
-    fun createAccessToken(userName: String, roles: List<String>): TokenVO {
+    fun createAccessToken(userName: String, roles: List<String?>): TokenVO {
         val now = Date()
         val validity = Date(now.time + validInMilliseconds)
         val accessToken = getAccessToken(userName, roles, now, validity)
@@ -55,7 +54,7 @@ class JwtTokenProvider {
         )
     }
 
-    private fun getAccessToken(userName: String, roles: List<String>, now: Date, validity: Date): String {
+    private fun getAccessToken(userName: String, roles: List<String?>, now: Date, validity: Date): String {
         val issueURL = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
         return JWT.create()
             .withClaim("roles", roles)
@@ -67,7 +66,7 @@ class JwtTokenProvider {
             .trim()
     }
 
-    private fun getRefreshToken(userName: String, roles: List<String>, now: Date): String {
+    private fun getRefreshToken(userName: String, roles: List<String?>, now: Date): String {
         val validityRefreshToken = Date(now.time + (validInMilliseconds * 3))
         return JWT.create()
             .withClaim("roles", roles)

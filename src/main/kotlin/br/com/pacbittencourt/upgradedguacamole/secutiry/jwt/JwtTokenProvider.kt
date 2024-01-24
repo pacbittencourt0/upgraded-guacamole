@@ -47,7 +47,7 @@ class JwtTokenProvider {
             userName = userName,
             authenticated = true,
             accessToken = accessToken,
-            refreshToke = refreshToken,
+            refreshToken = refreshToken,
             created = now,
             expiration = validity
 

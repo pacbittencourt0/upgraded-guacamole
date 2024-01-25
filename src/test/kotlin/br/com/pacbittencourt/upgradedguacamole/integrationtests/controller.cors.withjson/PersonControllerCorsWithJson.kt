@@ -2,24 +2,19 @@ package br.com.pacbittencourt.upgradedguacamole.integrationtests.controller.cors
 
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.ConfigsTest
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.AbstractIntegrationTest
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.PersonVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.restassured.RestAssured
+import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.LogDetail
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.specification.RequestSpecification
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -30,12 +25,37 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
     private lateinit var specification: RequestSpecification
     private lateinit var objectMapper: ObjectMapper
     private lateinit var person: PersonVO
+    private lateinit var token: String
 
     @BeforeAll
     fun setupTests() {
         objectMapper = ObjectMapper()
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         person = PersonVO()
+        token = ""
+    }
+
+    @Test
+    @Order(0)
+    fun authorization() {
+        val user = AccountCredentialsVO(
+            username = "pacb",
+            password = "pedro123"
+        )
+
+        token = given()
+            .basePath("/auth/signin")
+            .port(ConfigsTest.SERVER_PORT)
+            .contentType(ConfigsTest.CONTENT_TYPE_JSON)
+            .body(user)
+            .`when`()
+            .post()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .`as`(TokenVO::class.java)
+            .accessToken!!
     }
 
     @Test
@@ -48,6 +68,9 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
                 ConfigsTest.HEADER_PARAM_ORIGIN,
                 ConfigsTest.ORIGIN_ERUDIO
             )
+            .addHeader(
+                ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $token"
+            )
             .setBasePath("/api/person/v1")
             .setPort(ConfigsTest.SERVER_PORT)
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -55,7 +78,7 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
             .build()
 
 
-        val content = RestAssured.given()
+        val content = given()
             .spec(specification)
             .contentType(ConfigsTest.CONTENT_TYPE_JSON)
             .body(person)
@@ -95,6 +118,9 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
                 ConfigsTest.HEADER_PARAM_ORIGIN,
                 ConfigsTest.ORIGIN_SEMERU
             )
+            .addHeader(
+                ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $token"
+            )
             .setBasePath("/api/person/v1")
             .setPort(ConfigsTest.SERVER_PORT)
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -102,7 +128,7 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
             .build()
 
 
-        val content = RestAssured.given()
+        val content = given()
             .spec(specification)
             .contentType(ConfigsTest.CONTENT_TYPE_JSON)
             .body(person)
@@ -125,6 +151,9 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
                 ConfigsTest.HEADER_PARAM_ORIGIN,
                 ConfigsTest.ORIGIN_LOCALHOST
             )
+            .addHeader(
+                ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $token"
+            )
             .setBasePath("/api/person/v1")
             .setPort(ConfigsTest.SERVER_PORT)
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -132,7 +161,7 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
             .build()
 
 
-        val content = RestAssured.given()
+        val content = given()
             .spec(specification)
             .contentType(ConfigsTest.CONTENT_TYPE_JSON)
             .pathParam("id", person.id)
@@ -168,6 +197,9 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
                 ConfigsTest.HEADER_PARAM_ORIGIN,
                 ConfigsTest.ORIGIN_SEMERU
             )
+            .addHeader(
+                ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $token"
+            )
             .setBasePath("/api/person/v1")
             .setPort(ConfigsTest.SERVER_PORT)
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -175,7 +207,7 @@ class PersonControllerCorsWithJson : AbstractIntegrationTest() {
             .build()
 
 
-        val content = RestAssured.given()
+        val content = given()
             .spec(specification)
             .contentType(ConfigsTest.CONTENT_TYPE_JSON)
             .pathParam("id", person.id)

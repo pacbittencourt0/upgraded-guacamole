@@ -28,6 +28,18 @@ class AuthService {
 
     private val logger = Logger.getLogger(AuthService::class.java.name)
 
+    fun refreshToken(username: String, refreshToken: String): ResponseEntity<*> {
+        logger.info("Trying refresh token to user $username")
+
+        val user = repository.findByUsername(username)
+        val tokenResponse: TokenVO = if (user != null) {
+            tokenProvider.refreshToken(refreshToken)
+        } else {
+            throw UsernameNotFoundException("Username $username not found!")
+        }
+        return ResponseEntity.ok(tokenResponse)
+    }
+
     fun signin(data: AccountCredentialsVO): ResponseEntity<*> {
         logger.info("Trying log user ${data.username}")
         return try {

@@ -44,7 +44,7 @@ class JwtTokenProvider {
         val accessToken = getAccessToken(userName, roles, now, validity)
         val refreshToken = getRefreshToken(userName, roles, now)
         return TokenVO(
-            userName = userName,
+            username = userName,
             authenticated = true,
             accessToken = accessToken,
             refreshToken = refreshToken,

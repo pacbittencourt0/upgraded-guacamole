@@ -1,9 +1,9 @@
 package br.com.pacbittencourt.upgradedguacamole.data.vo.v1
 
-import java.util.*
+import java.util.Date
 
 data class TokenVO(
-    val userName: String? = null,
+    val username: String? = null,
     val authenticated: Boolean? = null,
     val created: Date? = null,
     val expiration: Date? = null,

@@ -13,9 +13,9 @@ class OpenApiConfig {
     fun customOpenApi(): OpenAPI {
         return OpenAPI()
             .info(
-                Info().title("Title")
+                Info().title("API to Learn Spring Boot")
                     .version("v1")
-                    .description("Description")
+                    .description("API to learn Spring Boot with Kotlin")
                     .termsOfService("some url")
                     .license(
                         License().name("Apache 2.0")

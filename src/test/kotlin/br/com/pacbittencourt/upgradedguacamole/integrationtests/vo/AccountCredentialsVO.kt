@@ -1,6 +1,9 @@
 package br.com.pacbittencourt.upgradedguacamole.integrationtests.vo
 
+import jakarta.xml.bind.annotation.XmlRootElement
+
+@XmlRootElement
 data class AccountCredentialsVO(
-    val username: String? = null,
-    val password: String? = null
+    var username: String? = null,
+    var password: String? = null
 )

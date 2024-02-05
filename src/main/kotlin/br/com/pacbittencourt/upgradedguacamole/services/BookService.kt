@@ -8,10 +8,10 @@ import br.com.pacbittencourt.upgradedguacamole.mapper.DozerMapper
 import br.com.pacbittencourt.upgradedguacamole.mapper.custom.BookMapper
 import br.com.pacbittencourt.upgradedguacamole.model.Book
 import br.com.pacbittencourt.upgradedguacamole.repository.BookRepository
+import java.util.logging.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
 
 @Service
 class BookService {
@@ -59,5 +59,26 @@ class BookService {
         bookVO.add(withSelfRel)
 
         return bookVO
+    }
+
+    fun update(book: BookVO?): BookVO {
+        if (book == null) throw RequireObjectIsNullException()
+        logger.info("Updating person with id: ${book.key}")
+        val entity = findOne(book.key).apply {
+            author = book.author
+            title = book.title
+            launchDate = book.launchDate
+            price = book.price
+        }
+        val bookVO = DozerMapper.parseObject(repository.save(entity), BookVO::class.java)
+        val withSelfRel = linkTo(BookController::class.java).slash(bookVO.key).withSelfRel()
+        bookVO.add(withSelfRel)
+        return bookVO
+    }
+
+    fun delete(id: Long) {
+        logger.info("Deleting book with id: $id")
+        val entity = findOne(id)
+        repository.delete(entity)
     }
 }

@@ -9,4 +9,5 @@ data class PersonVO(
     var lastName: String = "",
     var address: String = "",
     var gender: String = "",
+    var enabled: Boolean = true,
 )

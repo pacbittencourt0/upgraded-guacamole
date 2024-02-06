@@ -8,10 +8,11 @@ import br.com.pacbittencourt.upgradedguacamole.mapper.DozerMapper
 import br.com.pacbittencourt.upgradedguacamole.mapper.custom.PersonMapper
 import br.com.pacbittencourt.upgradedguacamole.model.Person
 import br.com.pacbittencourt.upgradedguacamole.repository.PersonRepository
+import java.util.logging.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
+import org.springframework.transaction.annotation.Transactional
 import br.com.pacbittencourt.upgradedguacamole.data.vo.v2.PersonVO as PersonVOV2
 
 @Service
@@ -67,6 +68,18 @@ class PersonService {
             gender = person.gender
         }
         val personVO = DozerMapper.parseObject(repository.save(entity), PersonVO::class.java)
+        val withSelfRel = linkTo(PersonController::class.java).slash(personVO.key).withSelfRel()
+        personVO.add(withSelfRel)
+
+        return personVO
+    }
+
+    @Transactional
+    fun disablePerson(id: Long): PersonVO {
+        logger.info("Disabling one person with ID $id")
+        repository.disablePerson(id)
+        val personVO = DozerMapper.parseObject(findOne(id), PersonVO::class.java)
+
         val withSelfRel = linkTo(PersonController::class.java).slash(personVO.key).withSelfRel()
         personVO.add(withSelfRel)
 

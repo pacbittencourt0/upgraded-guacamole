@@ -14,6 +14,7 @@ import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer
@@ -36,6 +37,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         lastName = "Bittencourt",
         address = "Juiz de Fora",
         gender = "male",
+        enabled = true,
     )
 
     @BeforeAll
@@ -94,6 +96,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals(result.lastName, "Bittencourt")
         assertEquals(result.address, "Juiz de Fora")
         assertEquals(result.gender, "male")
+        assert(result.enabled)
 
         personVO = result
     }
@@ -121,10 +124,37 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals(result.lastName, personVO.lastName)
         assertEquals(result.address, personVO.address)
         assertEquals(result.gender, personVO.gender)
+        assert(result.enabled)
     }
 
     @Test
     @Order(2)
+    fun testDisablePerson() {
+        val response = given()
+            .spec(specification)
+            .contentType(ConfigsTest.CONTENT_TYPE_JSON)
+            .pathParam("id", personVO.id)
+            .`when`()
+            .patch("{id}")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        val result = objectMapper.readValue(response, PersonVO::class.java)
+
+        assertNotNull(result)
+        assertNotNull(result.id)
+        assertEquals(result.firstName, personVO.firstName)
+        assertEquals(result.lastName, personVO.lastName)
+        assertEquals(result.address, personVO.address)
+        assertEquals(result.gender, personVO.gender)
+        assertFalse(result.enabled)
+    }
+
+    @Test
+    @Order(3)
     fun testFindAllPerson() {
         val response = given()
             .spec(specification)
@@ -143,7 +173,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     fun testUpdatePerson() {
         val newAddress = "Brasil"
         personVO.address = newAddress
@@ -164,10 +194,11 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
         assertNotNull(result)
         assertEquals(personResult.address, newAddress)
+        assertFalse(personResult.enabled)
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun testDeletePerson() {
         given()
             .spec(specification)

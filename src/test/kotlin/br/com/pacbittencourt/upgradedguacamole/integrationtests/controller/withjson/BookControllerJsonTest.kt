@@ -5,6 +5,7 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.BookVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.WrapperBookVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured.given
@@ -126,65 +127,69 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
         assertEquals(result.launchDate, bookVO.launchDate)
     }
 
-        @Test
-        @Order(2)
-        fun testFindAllBook() {
-            val response = given()
-                .spec(specification)
-                .`when`()
-                .get()
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString()
-            val bookList = objectMapper.readValue(response, Array<BookVO>::class.java)
+    @Test
+    @Order(2)
+    fun testFindAllBook() {
+        val response = given()
+            .spec(specification)
+            .`when`()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+        val wrapper = objectMapper.readValue(response, WrapperBookVO::class.java)
 
-            assertNotNull(bookList)
-            assert(bookList.isNotEmpty())
-        }
+        assertNotNull(wrapper)
+        assert(wrapper.embedded!!.books!!.isNotEmpty())
+        val bookOne = wrapper.embedded!!.books!![0]
+        assert(bookOne.title == "Big Data: como extrair volume, variedade, velocidade e valor da avalanche de informação cotidiana")
+        assert(bookOne.price == 54.0)
+        assert(bookOne.author == "Viktor Mayer-Schonberger e Kenneth Kukier")
+    }
 
-        @Test
-        @Order(3)
-        fun testUpdateBook() {
-            val newAuthor = "Zezé"
-            bookVO.author = newAuthor
+    @Test
+    @Order(3)
+    fun testUpdateBook() {
+        val newAuthor = "Zezé"
+        bookVO.author = newAuthor
 
-            val result = given()
-                .spec(specification)
-                .body(bookVO)
-                .`when`()
-                .put()
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString()
+        val result = given()
+            .spec(specification)
+            .body(bookVO)
+            .`when`()
+            .put()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
 
-            val bookResult = objectMapper.readValue(result, BookVO::class.java)
+        val bookResult = objectMapper.readValue(result, BookVO::class.java)
 
-            assertNotNull(result)
-            assertEquals(bookResult.author, newAuthor)
-        }
+        assertNotNull(result)
+        assertEquals(bookResult.author, newAuthor)
+    }
 
-        @Test
-        @Order(4)
-        fun testDeleteBook() {
-            given()
-                .spec(specification)
-                .pathParam("id", bookVO.id)
-                .`when`()
-                .delete("{id}")
-                .then()
-                .statusCode(204)
+    @Test
+    @Order(4)
+    fun testDeleteBook() {
+        given()
+            .spec(specification)
+            .pathParam("id", bookVO.id)
+            .`when`()
+            .delete("{id}")
+            .then()
+            .statusCode(204)
 
-            given()
-                .spec(specification)
-                .pathParam("id", bookVO.id)
-                .`when`()
-                .get("{id}")
-                .then()
-                .statusCode(404)
-        }
+        given()
+            .spec(specification)
+            .pathParam("id", bookVO.id)
+            .`when`()
+            .get("{id}")
+            .then()
+            .statusCode(404)
+    }
 
 }

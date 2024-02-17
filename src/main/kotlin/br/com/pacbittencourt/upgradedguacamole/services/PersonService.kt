@@ -41,6 +41,14 @@ class PersonService {
         return assembler.toModel(vos)
     }
 
+    fun findPersonByName(firstName: String, pageable: Pageable): PagedModel<EntityModel<PersonVO>> {
+        logger.info("Finding all people")
+        val persons = repository.findPersonByName(firstName, pageable)
+        val vos = persons.map { p -> DozerMapper.parseObject(p, PersonVO::class.java) }
+        vos.map { p -> p.add(linkTo(PersonController::class.java).slash(p.key).withSelfRel()) }
+        return assembler.toModel(vos)
+    }
+
     fun findById(id: Long): PersonVO {
         logger.info("Finding one person with ID $id")
         val personVO = DozerMapper.parseObject(findOne(id), PersonVO::class.java)

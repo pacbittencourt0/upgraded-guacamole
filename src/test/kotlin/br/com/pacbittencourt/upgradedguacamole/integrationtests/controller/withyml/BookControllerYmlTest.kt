@@ -6,6 +6,7 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.BookVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.ResultBookYml
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.config.EncoderConfig
@@ -136,7 +137,7 @@ class BookControllerYmlTest : AbstractIntegrationTest() {
     @Test
     @Order(2)
     fun testFindAllBooks() {
-        val bookList = given()
+        val resultYml = given()
             .config(config)
             .spec(specification)
             .`when`()
@@ -145,10 +146,15 @@ class BookControllerYmlTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .body()
-            .`as`(Array<BookVO>::class.java, objectMapper)
+            .`as`(ResultBookYml::class.java, objectMapper)
 
-        assertNotNull(bookList)
-        assert(bookList.isNotEmpty())
+        assertNotNull(resultYml)
+        assert(resultYml.content!!.isNotEmpty())
+
+        val bookOne = resultYml!!.content!![0]
+        assert(bookOne.title == "Big Data: como extrair volume, variedade, velocidade e valor da avalanche de informação cotidiana")
+        assert(bookOne.price == 54.0)
+        assert(bookOne.author == "Viktor Mayer-Schonberger e Kenneth Kukier")
     }
 
     @Test

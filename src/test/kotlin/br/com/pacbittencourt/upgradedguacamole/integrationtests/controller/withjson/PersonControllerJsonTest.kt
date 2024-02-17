@@ -5,6 +5,7 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.WrapperPersonVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured.given
@@ -159,6 +160,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         val response = given()
             .spec(specification)
             .contentType(ConfigsTest.CONTENT_TYPE_JSON)
+            .queryParams("page", 3, "size", 6, "direction", "asc")
             .`when`()
             .get()
             .then()
@@ -166,10 +168,11 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .extract()
             .body()
             .asString()
-        val listPerson = objectMapper.readValue(response, Array<PersonVO>::class.java)
+        val wrapper = objectMapper.readValue(response, WrapperPersonVO::class.java)
+        val listPerson = wrapper.embedded?.persons
 
         assertNotNull(listPerson)
-        assert(listPerson.isNotEmpty())
+        assert(listPerson!!.isNotEmpty())
     }
 
     @Test

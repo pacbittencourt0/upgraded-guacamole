@@ -5,9 +5,9 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.WrapperPersonVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.LogDetail
@@ -43,7 +43,7 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
 
     @BeforeAll
     fun setupTests() {
-        objectMapper = XmlMapper()
+        objectMapper = ObjectMapper()
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
         val user = AccountCredentialsVO(
@@ -67,7 +67,6 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
 
         specification = RequestSpecBuilder()
             .addHeader(ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $accessToken")
-            .setAccept(ConfigsTest.CONTENT_TYPE_XML)
             .setContentType(ConfigsTest.CONTENT_TYPE_XML)
             .setBasePath("/api/person/v1")
             .setPort(ConfigsTest.SERVER_PORT)
@@ -165,10 +164,10 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
             .extract()
             .body()
             .asString()
-        val listPerson = objectMapper.readValue(response, Array<PersonVO>::class.java)
+        val wrapper = objectMapper.readValue(response, WrapperPersonVO::class.java)
 
-        assertNotNull(listPerson)
-        assert(listPerson.isNotEmpty())
+        assertNotNull(wrapper)
+        assert(wrapper.embedded!!.persons!!.isNotEmpty())
     }
 
     @Test

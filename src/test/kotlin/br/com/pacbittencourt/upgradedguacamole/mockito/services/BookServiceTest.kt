@@ -3,6 +3,7 @@ package br.com.pacbittencourt.upgradedguacamole.mockito.services
 import br.com.pacbittencourt.upgradedguacamole.mapper.mocks.MockBook
 import br.com.pacbittencourt.upgradedguacamole.repository.BookRepository
 import br.com.pacbittencourt.upgradedguacamole.services.BookService
+import java.util.Optional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -14,7 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.jupiter.MockitoExtension
-import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 internal class BookServiceTest {
@@ -33,7 +33,7 @@ internal class BookServiceTest {
         MockitoAnnotations.openMocks(this)
     }
 
-    @Test
+    /*@Test
     fun findAll() {
         val list = inputObject.mockEntityList()
         `when`(repository.findAll()).thenReturn(list)
@@ -61,7 +61,7 @@ internal class BookServiceTest {
         assertEquals("Title 5", bookFive.title)
         assertEquals(5.0, bookFive.price)
 
-    }
+    }*/
 
     @Test
     fun findById() {

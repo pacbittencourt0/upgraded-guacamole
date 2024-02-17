@@ -5,9 +5,9 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.BookVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.WrapperBookVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.LogDetail
@@ -43,7 +43,7 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
 
     @BeforeAll
     fun setupTests() {
-        objectMapper = XmlMapper()
+        objectMapper = ObjectMapper()
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
         val user = AccountCredentialsVO(
@@ -67,7 +67,6 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
 
         specification = RequestSpecBuilder()
             .addHeader(ConfigsTest.HEADER_PARAM_AUTHOZIATION, "Bearer $accessToken")
-            .setAccept(ConfigsTest.CONTENT_TYPE_XML)
             .setContentType(ConfigsTest.CONTENT_TYPE_XML)
             .setBasePath("/api/book/v1")
             .setPort(ConfigsTest.SERVER_PORT)
@@ -138,10 +137,14 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
             .extract()
             .body()
             .asString()
-        val bookList = objectMapper.readValue(response, Array<BookVO>::class.java)
+        val wrapper = objectMapper.readValue(response, WrapperBookVO::class.java)
 
-        assertNotNull(bookList)
-        assert(bookList.isNotEmpty())
+        assertNotNull(wrapper)
+        assert(wrapper.embedded!!.books!!.isNotEmpty())
+        val bookOne = wrapper.embedded!!.books!![0]
+        assert(bookOne.title == "Big Data: como extrair volume, variedade, velocidade e valor da avalanche de informação cotidiana")
+        assert(bookOne.price == 54.0)
+        assert(bookOne.author == "Viktor Mayer-Schonberger e Kenneth Kukier")
     }
 
     @Test

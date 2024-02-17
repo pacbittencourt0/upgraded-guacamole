@@ -6,6 +6,7 @@ import br.com.pacbittencourt.upgradedguacamole.integrationtests.testcontainers.A
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.AccountCredentialsVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.PersonVO
 import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.TokenVO
+import br.com.pacbittencourt.upgradedguacamole.integrationtests.vo.wrappers.ResultYml
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.config.EncoderConfig
@@ -162,7 +163,7 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
     @Test
     @Order(3)
     fun testFindAllPerson() {
-        val listPerson = given()
+        val resultYml = given()
             .config(config)
             .spec(specification)
             .`when`()
@@ -171,10 +172,16 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .body()
-            .`as`(Array<PersonVO>::class.java, objectMapper)
+            .`as`(ResultYml::class.java, objectMapper)
 
-        assertNotNull(listPerson)
-        assert(listPerson.isNotEmpty())
+        assertNotNull(resultYml)
+        assert(resultYml.content!!.isNotEmpty())
+        val personOne = resultYml.content?.get(0)!!
+        assert(personOne.firstName == "Aaron")
+        assert(personOne.lastName == "Oddy")
+        assert(personOne.address == "01 Colorado Court")
+        assert(personOne.gender == "Male")
+        assert(!personOne.enabled)
     }
 
     @Test

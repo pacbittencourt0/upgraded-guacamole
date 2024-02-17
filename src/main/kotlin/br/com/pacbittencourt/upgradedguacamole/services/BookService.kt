@@ -5,11 +5,14 @@ import br.com.pacbittencourt.upgradedguacamole.data.vo.v1.BookVO
 import br.com.pacbittencourt.upgradedguacamole.exceptions.RequireObjectIsNullException
 import br.com.pacbittencourt.upgradedguacamole.exceptions.ResourceNotFoundException
 import br.com.pacbittencourt.upgradedguacamole.mapper.DozerMapper
-import br.com.pacbittencourt.upgradedguacamole.mapper.custom.BookMapper
 import br.com.pacbittencourt.upgradedguacamole.model.Book
 import br.com.pacbittencourt.upgradedguacamole.repository.BookRepository
 import java.util.logging.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
 
@@ -20,19 +23,16 @@ class BookService {
     private lateinit var repository: BookRepository
 
     @Autowired
-    private lateinit var mapper: BookMapper
+    private lateinit var assembler: PagedResourcesAssembler<BookVO>
 
     private val logger = Logger.getLogger(BookService::class.java.name)
 
-    fun findAll(): List<BookVO> {
+    fun findAll(pageable: Pageable): PagedModel<EntityModel<BookVO>> {
         logger.info("Finding all books")
-        val books = repository.findAll()
-        val vos = DozerMapper.parseObjectList(books, BookVO::class.java)
-        vos.forEach { book ->
-            val withSelfRef = linkTo(BookController::class.java).slash(book.key).withSelfRel()
-            book.add(withSelfRef)
-        }
-        return vos
+        val books = repository.findAll(pageable)
+        val vos = books.map { b -> DozerMapper.parseObject(b, BookVO::class.java) }
+        vos.map { b -> b.add(linkTo(BookController::class.java).slash(b.key).withSelfRel()) }
+        return assembler.toModel(vos)
     }
 
     fun findById(id: Long): BookVO {

@@ -172,6 +172,33 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(4)
+    fun testFindByName() {
+        val response = given()
+            .spec(specification)
+            .pathParam("firstName", "ped")
+            .queryParams("page", 0, "size", 6, "direction", "asc")
+            .`when`()["findPersonByName/{firstName}"]
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+        val wrapper = objectMapper.readValue(response, WrapperPersonVO::class.java)
+
+        assertNotNull(wrapper)
+        assert(wrapper.embedded!!.persons!!.isNotEmpty())
+
+
+        val person = wrapper.embedded!!.persons!![0]
+        assert(person.firstName == "Pedro")
+        assert(person.lastName == "Bittencourt")
+        assert(person.address == "Juiz de Fora, MG")
+        assert(person.gender == "male")
+        assert(person.enabled)
+    }
+
+    @Test
+    @Order(5)
     fun testUpdatePerson() {
         val newAddress = "Brasil"
         personVO.address = newAddress
@@ -195,7 +222,7 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun testDeletePerson() {
         given()
             .spec(specification)

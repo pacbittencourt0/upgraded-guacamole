@@ -186,6 +186,31 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(4)
+    fun testFindByName() {
+        val resultYml = given()
+            .config(config)
+            .spec(specification)
+            .pathParam("firstName", "ped")
+            .queryParams("page", 0, "size", 6, "direction", "asc")
+            .`when`()["findPersonByName/{firstName}"]
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .`as`(ResultYml::class.java, objectMapper)
+
+        assertNotNull(resultYml)
+        assert(resultYml.content!!.isNotEmpty())
+        val person = resultYml.content?.get(0)!!
+        assert(person.firstName == "Pedro")
+        assert(person.lastName == "Bittencourt")
+        assert(person.address == "Juiz de Fora, MG")
+        assert(person.gender == "male")
+        assert(person.enabled)
+    }
+
+    @Test
+    @Order(4)
     fun testUpdatePerson() {
         val newAddress = "Brasil"
         personVO.address = newAddress

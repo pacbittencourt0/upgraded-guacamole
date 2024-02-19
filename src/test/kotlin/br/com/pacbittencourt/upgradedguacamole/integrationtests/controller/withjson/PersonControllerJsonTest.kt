@@ -230,6 +230,28 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
     @Test
     @Order(6)
+    fun testHATEOAS() {
+        val response = given()
+            .spec(specification)
+            .contentType(ConfigsTest.CONTENT_TYPE_JSON)
+            .queryParams("page", 3, "size", 6, "direction", "asc")
+            .`when`()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        assert(response.contains(""""_links":{"self":{"href":"http://localhost:8888/api/person/v1/586"}}"""))
+        assert(response.contains(""""first":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=0&size=6&sort=firstName,asc"}"""))
+        assert(response.contains(""""last":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=167&size=6&sort=firstName,asc"}"""))
+        assert(response.contains(""""prev":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=2&size=6&sort=firstName,asc"}"""))
+        assert(response.contains(""""page":{"size":6,"totalElements":1008,"totalPages":168,"number":3}"""))
+    }
+
+    @Test
+    @Order(7)
     fun testDeletePerson() {
         given()
             .spec(specification)
@@ -249,5 +271,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .then()
             .statusCode(404)
     }
+
+
 
 }

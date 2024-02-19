@@ -234,6 +234,36 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(5)
+    fun testHATEOAS() {
+        val response = given()
+            .config(config)
+            .spec(specification)
+            .queryParams("page", 3, "size", 6, "direction", "asc")
+            .`when`()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body().asString()
+
+        assert(response.contains("""links:
+  - rel: "self"
+    href: "http://localhost:8888/api/person/v1/586""""))
+        assert(response.contains("""- rel: "first"
+  href: "http://localhost:8888/api/person/v1?direction=asc&page=0&size=6&sort=firstName,asc""""))
+        assert(response.contains("""- rel: "last"
+  href: "http://localhost:8888/api/person/v1?direction=asc&page=167&size=6&sort=firstName,asc""""))
+        assert(response.contains("""- rel: "prev"
+  href: "http://localhost:8888/api/person/v1?direction=asc&page=2&size=6&sort=firstName,asc""""))
+        assert(response.contains("""page:
+  size: 6
+  totalElements: 1008
+  totalPages: 168
+  number: 3"""))
+    }
+
+    @Test
+    @Order(6)
     fun testDeletePerson() {
         given()
             .spec(specification)

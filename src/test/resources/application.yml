@@ -1,5 +1,7 @@
 cors:
   originPatterns: https://localhost:3000,https://localhost:8080,https://erudio.com.br
+file:
+  upload-dir: /Users/pedro.bittencourt/Projects/upgraded-guacamole/files-upload
 server:
   port: 8888
 security:
@@ -14,6 +16,12 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 spring-doc:
   paths-to-match:
     - /api/**/v1/**

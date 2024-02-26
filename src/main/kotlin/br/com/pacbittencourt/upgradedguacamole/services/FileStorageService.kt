@@ -2,11 +2,14 @@ package br.com.pacbittencourt.upgradedguacamole.services
 
 import br.com.pacbittencourt.upgradedguacamole.config.FileStorageConfig
 import br.com.pacbittencourt.upgradedguacamole.exceptions.FileStorageException
+import br.com.pacbittencourt.upgradedguacamole.exceptions.MyFileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
@@ -36,6 +39,20 @@ class FileStorageService @Autowired constructor(
             fileName
         } catch (e: Exception) {
             throw FileStorageException("Could not store file $fileName. Please try again!", e)
+        }
+    }
+
+    fun loadFileAsResource(fileName: String): Resource {
+        return try {
+            val filePath = fileStorageLocation.resolve(fileName).normalize()
+            val resource = UrlResource(filePath.toUri())
+            if (resource.exists()) {
+                resource
+            } else {
+                throw MyFileNotFoundException("File not found $fileName")
+            }
+        } catch (e: Exception) {
+            throw MyFileNotFoundException("File not found $fileName", e)
         }
     }
 }

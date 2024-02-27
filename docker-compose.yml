@@ -19,8 +19,8 @@ services:
   rest-with-spring-boot-guacamole:
     image: pacbittencourt/guacamole
     restart: always
-    build: ./upgraded-guacamole
-    working_dir: /upgraded-guacamole
+    build: ./
+    working_dir: /
     environment:
       TZ: America/Sao_Paulo
       SPRING.DATASOURCE.URL: jdbc:mariadb://db:3308/guacamole?useTimezone=true&serverTimezone=UTC

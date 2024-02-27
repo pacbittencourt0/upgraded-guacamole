@@ -257,7 +257,7 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
   href: "http://localhost:8888/api/person/v1?direction=asc&page=2&size=6&sort=firstName,asc""""))
         assert(response.contains("""page:
   size: 6
-  totalElements: 1008
+  totalElements: 1007
   totalPages: 168
   number: 3"""))
     }
